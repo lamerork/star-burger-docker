@@ -6,10 +6,7 @@ services:
     container_name: sb_postgres
     volumes:
       - db_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB-star_burger}
-      POSTGRES_USER: ${POSTGRES_USER-star_burger}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD-star_burger}
+
     ports:
       - 5432:5432
 
@@ -18,18 +15,18 @@ services:
     container_name: sb_frontend
     build: ../frontend
     volumes:
-      - staticfiles:/app/staticfiles
+      - /home/lamerork/apps/star-burger-docker/staticfiles:/app/staticfiles
 
   backend:
     image: sb_backend
     container_name: sb_backend
     build: ../backend
     volumes:
-      - staticfiles:/app/staticfiles
-      - media:/app/media
+      - /home/lamerork/apps/star-burger-docker/staticfiles:/app/staticfiles
+      - /home/lamerork/apps/star-burger-docker/media:/app/media
     env_file:
       - .env
-    command: gunicorn -w 3 -b 0.0.0.0:8080 star_burger.wsgi:application
+    command: gunicorn -w 3 -b 127.0.0.1:8080 star_burger.wsgi:application
     ports:
       - 8080:8080
 
@@ -39,5 +36,3 @@ services:
 
 volumes:
   db_data:
-  staticfiles:
-  media:
