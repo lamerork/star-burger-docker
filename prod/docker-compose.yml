@@ -1,0 +1,43 @@
+version: '3'
+services:
+
+  db:
+    image: postgres:14.7-alpine
+    container_name: sb_postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB-star_burger}
+      POSTGRES_USER: ${POSTGRES_USER-star_burger}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD-star_burger}
+    ports:
+      - 5432:5432
+
+  frontend:
+    image: sb_frontend
+    container_name: sb_frontend
+    build: ../frontend
+    volumes:
+      - staticfiles:/app/staticfiles
+
+  backend:
+    image: sb_backend
+    container_name: sb_backend
+    build: ../backend
+    volumes:
+      - staticfiles:/app/staticfiles
+      - media:/app/media
+    env_file:
+      - .env
+    command: gunicorn -w 3 -b 0.0.0.0:8080 star_burger.wsgi:application
+    ports:
+      - 8080:8080
+
+    depends_on:
+      - db
+      - frontend
+
+volumes:
+  db_data:
+  staticfiles:
+  media:
